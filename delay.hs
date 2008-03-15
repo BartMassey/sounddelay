@@ -12,6 +12,19 @@ import System.Console.ParseArgs
 import Data.WAVE
 import DelayArgs
 
+delay :: Bool -> Int-> Int -> Double -> [[Double]] -> [[Double]]
+delay forward channels delay_samples amplitude samples =
+    zipWith (zipWith (+)) mix' samples''
+    where
+      samples' = map (map (* (1.0 - amplitude))) samples
+      silent_frame = replicate channels 0.0
+      mix = if forward
+            then repeat silent_frame
+            else samples'
+      mix' = map (map (* amplitude)) mix
+      samples'' = replicate delay_samples silent_frame ++ samples'
+
+
 main :: IO ()
 main = do
     args <- parseArgsIO ArgsComplete argd
@@ -22,18 +35,13 @@ main = do
     --- figure the parameters
     let hd = waveHeader wav
     let rate = waveFrameRate hd
-    let delay = fromJust (getArgInt args OptionDelay)
-    let delay_samples = rate * delay `div` 1000
+    let odelay = fromJust (getArgInt args OptionDelay)
+    let delay_samples = rate * odelay `div` 1000
     let amplitude = fromJust (getArgDouble args OptionAmplitude) / 100
-    let silent_frame = replicate (waveNumChannels hd) 0.0
+    let forward = gotArg args OptionForward
+    let channels = waveNumChannels hd
     --- run delay program on the input
-    let samples' = map (map (* (1.0 - amplitude))) samples
-    let mix = if gotArg args OptionForward
-              then repeat silent_frame
-              else samples'
-    let mix' = map (map (* amplitude)) mix
-    let samples'' = replicate delay_samples silent_frame ++ samples'
-    let result = zipWith (zipWith (+)) mix' samples''
+    let result = delay forward channels delay_samples amplitude samples
     --- write the output
     let samples' = map (map doubleToSample) result
     let wav' = WAVE { waveHeader = hd,

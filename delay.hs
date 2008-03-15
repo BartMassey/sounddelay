@@ -12,17 +12,19 @@ import System.Console.ParseArgs
 import Data.WAVE
 import DelayArgs
 
+
 delay :: Bool -> Int-> Int -> Double -> [[Double]] -> [[Double]]
 delay forward channels delay_samples amplitude samples =
-    zipWith (zipWith (+)) mix' samples''
+    result
     where
       samples' = map (map (* (1.0 - amplitude))) samples
       silent_frame = replicate channels 0.0
       mix = if forward
-            then repeat silent_frame
-            else samples'
-      mix' = map (map (* amplitude)) mix
-      samples'' = replicate delay_samples silent_frame ++ samples'
+            then samples'
+            else result
+      mix' = replicate delay_samples silent_frame ++ mix
+      mix'' = map (map (* amplitude)) mix'
+      result = zipWith (zipWith (+)) mix'' samples'
 
 
 main :: IO ()

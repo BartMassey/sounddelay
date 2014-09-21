@@ -1,7 +1,7 @@
 Name: sounddelay
 Build-Type: Simple
 Description: An audio file delay line for WAVE files.
-Version: 0.1.0.1
+Version: 0.1.0.2
 License: BSD3
 License-File: COPYING
 Copyright: Copyright (c) 2008 Bart Massey
@@ -17,6 +17,7 @@ Cabal-Version: >=1.10
 Executable delay
   Default-Language: Haskell2010
   Main-Is: sounddelay.hs
+  Other-Modules: DelayArgs
   Build-Depends: base >=3&&<5, containers >=0.3&&<1,
                  parseargs >=0.1&&<1,
                  WAVE >=0.1&&<1
@@ -28,4 +29,4 @@ Source-Repository head
 Source-Repository this
   Type: git
   Location: https://github.com/BartMassey/sounddelay.git
-  Tag: v0.1.0.1
+  Tag: v0.1.0.2
